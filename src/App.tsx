@@ -13,25 +13,30 @@ export function App() {
   const { data: paginatedTransactions, ...paginatedTransactionsUtils } = usePaginatedTransactions()
   const { data: transactionsByEmployee, ...transactionsByEmployeeUtils } = useTransactionsByEmployee()
   const [isLoading, setIsLoading] = useState(false)
-
+  const [selectedCustomer, setSelectedCustomer] = useState('');
+  
   const transactions = useMemo(
     () => paginatedTransactions?.data ?? transactionsByEmployee ?? null,
     [paginatedTransactions, transactionsByEmployee]
   )
-  
+
   const loadAllTransactions = useCallback(async () => {
     setIsLoading(true)
     transactionsByEmployeeUtils.invalidateData()
 
     await employeeUtils.fetchAll()
-    await paginatedTransactionsUtils.fetchAll()
+    if (selectedCustomer !== '') {
+      await transactionsByEmployeeUtils.fetchById(selectedCustomer)
+    } else {
+      await paginatedTransactionsUtils.fetchAll()
+    }
 
     setIsLoading(false)
   }, [employeeUtils, paginatedTransactionsUtils, transactionsByEmployeeUtils])
 
   const loadTransactionsByEmployee = useCallback(
     async (employeeId: string) => {
-      
+
       paginatedTransactionsUtils.invalidateData()
       if (employeeId !== '') {
         await transactionsByEmployeeUtils.fetchById(employeeId)
@@ -47,7 +52,7 @@ export function App() {
       loadAllTransactions()
     }
   }, [employeeUtils.loading, employees, loadAllTransactions])
-
+  
   return (
     <Fragment>
       <main className="MainContainer">
@@ -69,7 +74,7 @@ export function App() {
             if (newValue === null) {
               return
             }
-
+            setSelectedCustomer(newValue.id)
             await loadTransactionsByEmployee(newValue.id)
           }}
         />
