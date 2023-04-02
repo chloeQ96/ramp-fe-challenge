@@ -13,10 +13,6 @@ export function InputSelect<TItem>({
   loadingLabel,
 }: InputSelectProps<TItem>) {
   const [selectedValue, setSelectedValue] = useState<TItem | null>(defaultValue ?? null)
-  const [dropdownPosition, setDropdownPosition] = useState<DropdownPosition>({
-    top: 0,
-    left: 0,
-  })
 
   const onChange = useCallback<InputSelectOnChange<TItem>>(
     (selectedItem) => {
@@ -59,7 +55,6 @@ export function InputSelect<TItem>({
             <div
               className="RampInputSelect--input"
               onClick={(event) => {
-                setDropdownPosition(getDropdownPosition(event.target))
                 toggleProps.onClick(event)
               }}
             >
@@ -71,7 +66,6 @@ export function InputSelect<TItem>({
                 "RampInputSelect--dropdown-container-opened": isOpen,
               })}
               {...getMenuProps()}
-              style={{ top: dropdownPosition.top, left: dropdownPosition.left }}
             >
               {renderItems()}
             </div>
